@@ -46,12 +46,14 @@ class Server {
 
     private socketListener() {
         this.io.on('connection', (client) => {
-            console.log('New Client Connected!');
-
-            //Client disconnection Listener
-            socket.disconnect(client);
+            //Add User to the user list
+            socket.connectClient(client);
+            //Username Listener
+            socket.usernameListener(client);
             //Message Listener
             socket.messageListener(client,this.io);
+            //Client disconnection Listener
+            socket.disconnect(client);
         });
 
     };
