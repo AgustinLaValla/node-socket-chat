@@ -8,4 +8,4 @@ export class User {
         this.name = 'No name';
         this.room = 'No room';
     };
-};
+}

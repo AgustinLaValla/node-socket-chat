@@ -21,7 +21,6 @@ class Server {
         this.app = express();
         this.server = http.createServer(this.app);
         this.io = socketIO(this.server);
-        this.settings();
         this.middlewares();
         this.routes();
         this.socketListener();
@@ -30,8 +29,6 @@ class Server {
     public static get instance() {
         return this._instace || (this._instace = new this());
     };
-
-    settings() { };
 
     middlewares() {
         this.app.use(express.json());
@@ -49,11 +46,13 @@ class Server {
             //Add User to the user list
             socket.connectClient(client);
             //Username Listener
-            socket.usernameListener(client);
+            socket.usernameListener(client, this.io);
             //Message Listener
             socket.messageListener(client,this.io);
+            //Retrieve user
+            socket.getActiveUsers(client, this.io);
             //Client disconnection Listener
-            socket.disconnect(client);
+            socket.disconnect(client, this.io);
         });
 
     };

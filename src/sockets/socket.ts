@@ -6,26 +6,30 @@ import { User } from "../classes/user";
 export const connectedUsers = new UserList();
 
 //Connect Client (add to a list user)
-export const connectClient = (client:Socket) => {
+export const connectClient = (client: Socket) => {
     let user = new User(client.id);
     connectedUsers.addUser(user);
 };
 
-//Message Listener
-export const messageListener = (client:Socket, io:Server) => client.on('message', (message) => {
-    io.emit('new message' ,message);
-});
-
 //Username Listener
-export const usernameListener = (client:Socket) => client.on('user-config', (payload, callback) => {
+export const usernameListener = (client: Socket, io: Server) => client.on('user-config', (payload, callback) => {
     connectedUsers.updateName(client.id, payload.name);
     callback({
-        ok:true,
+        ok: true,
         message: `Usuario ${payload.name} setted`
     });
+    io.emit('active-users', connectedUsers.getUserList());
 });
 
+//Message Listener
+export const messageListener = (client: Socket, io: Server) => client.on('message', (message) => {
+    io.emit('new message', message);
+});
+export const getActiveUsers = (client: Socket, io: Server) => client.on('get users', () => {
+    io.to(client.id).emit('active-users', connectedUsers.getUserList());
+});
 //Client Disconnected Listener
-export const disconnect = (client: Socket) => client.on('disconnect', () => {
-    connectedUsers.deleteUser(client.id);
+export const disconnect = (client: Socket, io: Server) => client.on('disconnect', () => {
+    connectedUsers.deleteUser(client.id); //Delete user logged out
+    io.emit('active-users', connectedUsers.getUserList()); //Emit the list again
 }); 

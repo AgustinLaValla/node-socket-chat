@@ -22,7 +22,7 @@ export class UserList {
     };
 
     public getUserList(): User[] { 
-        return this.list;
+        return this.list.filter(user => user.name !== 'No name');
     };
 
     public getUser(id:string): User | undefined { 

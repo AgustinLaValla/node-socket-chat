@@ -1,5 +1,6 @@
-import { Router, Request, Response } from 'express';
-import Server from '../server';
+import { Router, Request } from 'express';
+import { sendMessages, sendPrivateMessages } from '../controller/messages.controller';
+import { getAllUserIds, getUsersList } from '../controller/user-list.controller';
 
 class IndexRoutes {
 
@@ -10,40 +11,17 @@ class IndexRoutes {
     this.routes();
   };
 
-  getMessages(req: Request, res: Response) {
-    const { sender,body } = req.body;
-
-    const payload = { sender, body };
-
-    const server = Server.instance;
-    server.io.emit('new message', payload);
-
-    return res.json({ ok: true, body});
-  };
-
-  getPrivateMessages(req: Request, res: Response) {
-    const { sender,body } = req.body;
-    const { id } = req.params;
-
-    const payload = { sender, body };
-
-    const server = Server.instance;
-    server.io.in( id ).emit('private-msg', payload);
-    return res.json({ok:true, body})
-  };
-
-  updateMessage(req: Request, res: Response) {
-    const { body } = req;
-    const { id } = req.params;
-  };
-
-  deleteMessage(req: Request, res: Response) {};
 
   routes() {
-    this.router.post('/messages', this.getMessages);
-    this.router.post('/messages/:id', this.getPrivateMessages);
-    this.router.put('/update/:id', this.updateMessage);
-    this.router.delete('/delete', this.deleteMessage)
+    //Messages Routes
+    this.router.post('/messages', sendMessages);
+    this.router.post('/messages/:id', sendPrivateMessages);
+
+    //User List Routes
+    this.router.get('/users', getAllUserIds);
+    this.router.get('/users/details', getUsersList);
+
+
   };
 };
 
